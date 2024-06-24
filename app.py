@@ -5,12 +5,11 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 db = SQLAlchemy(app)
-with app.app_context():
-    db.create_all()
 
 class TODO(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String(400), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(700), nullable=True)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
     def __retr__(self):
         return '<Task %r>' % self.id
@@ -18,15 +17,18 @@ class TODO(db.Model):
 @app.route('/',methods=['POST','GET'])
 def index():
     if request.method == 'POST':
-        task_content = request.form['content']
-        new_task = TODO(content=task_content)
+        task_name = request.form['name']
+        task_desc = request.form['description']
+        new_task = TODO(name=task_name, description=task_desc)
 
-        try:
-            db.session.add(new_task)
-            db.session.commit()
-            return redirect('/')
-        except:
-            return("something happened")
+        #try:
+        db.session.add(new_task)
+        print(1)
+        db.session.commit()
+        print(2)
+        return redirect('/')
+        #except:
+        #    return("something happened")
 
     else:
         tasks = TODO.query.order_by(TODO.date_created).all()
@@ -47,7 +49,8 @@ def update(id):
     task = TODO.query.get_or_404(id)
 
     if request.method == 'POST':
-        task.content = request.form['content']
+        task.name = request.form['name']
+        task.description = request.form['description']
         try:
             db.session.commit()
             return redirect('/')

@@ -4,6 +4,10 @@ body, html {
     background-color: lightblue;
 }
 
+.desc-inp-box{
+  height:30px;
+}
+
 .title {
   text-align: center;
 }
